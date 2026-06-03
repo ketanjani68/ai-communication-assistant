@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { width: 320px; padding: 16px; font-family: Arial, sans-serif; background: #f8faff; }
+
+    /* ── HEADER ─────────────────────────────────────────────────────────── */
+    .header {
+      background: linear-gradient(135deg, #2563EB, #7C3AED);
+      color: white;
+      padding: 14px;
+      border-radius: 10px;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+    .header h3 { font-size: 15px; margin-bottom: 3px; }
+    .header p  { font-size: 11px; opacity: 0.85; }
+
+    /* ── SETUP BANNER ───────────────────────────────────────────────────── */
+    .setup-banner {
+      background: #FEF3C7;
+      border: 1px solid #F59E0B;
+      border-radius: 8px;
+      padding: 10px 12px;
+      margin-bottom: 14px;
+      font-size: 12px;
+      color: #92400E;
+      display: none;
+    }
+    .setup-banner.show { display: block; }
+
+    /* ── LABELS ─────────────────────────────────────────────────────────── */
+    label {
+      font-size: 12px;
+      font-weight: 600;
+      color: #374151;
+      display: block;
+      margin: 12px 0 4px;
+    }
+
+    /* ── PROVIDER TABS ──────────────────────────────────────────────────── */
+    .tab-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .tab-btn {
+      flex: 1;
+      padding: 8px 6px;
+      font-size: 12px;
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+      border: 1px solid #BFDBFE;
+      background: white;
+      color: #2563EB;
+      transition: all 0.15s ease;
+    }
+    .tab-btn.active {
+      background: #2563EB;
+      color: white;
+      border-color: #2563EB;
+    }
+    .tab-btn:hover:not(.active) { background: #EFF6FF; }
+
+    /* ── INPUT ROW ──────────────────────────────────────────────────────── */
+    .input-row { position: relative; }
+    input[type="password"], input[type="text"], select {
+      width: 100%;
+      padding: 8px 36px 8px 10px;
+      border: 1px solid #BFDBFE;
+      border-radius: 6px;
+      font-size: 13px;
+      background: white;
+    }
+    .toggle-eye {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      font-size: 14px;
+      color: #64748b;
+    }
+
+    /* ── LINKS & STEPS ──────────────────────────────────────────────────── */
+    .get-key-link {
+      display: inline-block;
+      margin-top: 6px;
+      font-size: 11px;
+      color: #2563EB;
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .get-key-link:hover { text-decoration: underline; }
+
+    .steps {
+      background: #EFF6FF;
+      border-radius: 8px;
+      padding: 10px 12px;
+      margin-top: 6px;
+      font-size: 11px;
+      color: #1E3A5F;
+      line-height: 1.8;
+    }
+    .steps strong { display: block; margin-bottom: 4px; color: #2563EB; }
+
+    /* ── SAVE BUTTON ────────────────────────────────────────────────────── */
+    button.save-btn {
+      background: #2563EB;
+      color: white;
+      border: none;
+      padding: 10px;
+      width: 100%;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      margin-top: 14px;
+    }
+    button.save-btn:hover { background: #1D4ED8; }
+
+    #msg { color: #16a34a; font-size: 12px; margin-top: 8px; text-align: center; font-weight: 600; }
+    .divider { border: none; border-top: 1px solid #e0e7ff; margin: 14px 0; }
+
+    /* ── STATUS BOX ─────────────────────────────────────────────────────── */
+    .status-box {
+      background: white;
+      border: 1px solid #e0e7ff;
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 12px;
+    }
+    .status-row { display: flex; align-items: center; gap: 6px; margin-bottom: 4px; }
+    .dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: #DC2626;
+      flex-shrink: 0;
+    }
+    .dot.green  { background: #16A34A; }
+    .dot.yellow { background: #F59E0B; }
+    #api-model-status { color: #64748b; font-size: 11px; margin-top: 4px; }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <div class="header">
+    <h3>🤖 Teams AI Assistant</h3>
+    <p>Grammar Fix &amp; Hindi → English</p>
+  </div>
+
+  <!-- SETUP BANNER (hidden by default) -->
+  <div class="setup-banner" id="setup-banner">
+    ⚠️ Setup Required — Add your API key below to start
+  </div>
+
+  <!-- PROVIDER SELECTOR -->
+  <label>Select AI Provider</label>
+  <div class="tab-row">
+    <button class="tab-btn active" id="tab-groq">⚡ Groq (Fast &amp; Free)</button>
+    <button class="tab-btn" id="tab-google">🔵 Google AI Studio (Free)</button>
+  </div>
+  <!-- Hidden input that stores the chosen provider -->
+  <input type="hidden" id="apiProvider" value="groq">
+
+  <!-- ── GROQ SECTION ─────────────────────────────────────────────────── -->
+  <div id="groq-section">
+    <label>Groq API Key</label>
+    <div class="input-row">
+      <input type="password" id="groqApiKey" placeholder="gsk_xxxxxxxxxxxxxxxxxxxx" />
+      <span class="toggle-eye" id="toggle-groq-eye">👁️</span>
+    </div>
+    <a class="get-key-link" href="https://console.groq.com/keys" target="_blank">
+      🔗 Get Free Groq API Key →
+    </a>
+    <div class="steps">
+      <strong>📋 How to get free Groq API key:</strong>
+      1. Go to console.groq.com → Sign up free<br>
+      2. Click API Keys → Create API Key<br>
+      3. Copy key (starts with gsk_) → Paste above
+    </div>
+  </div>
+
+  <!-- ── GOOGLE SECTION (hidden by default) ───────────────────────────── -->
+  <div id="google-section" style="display:none;">
+    <label>Google AI Studio API Key</label>
+    <div class="input-row">
+      <input type="password" id="googleApiKey" placeholder="AIzaSy..." />
+      <span class="toggle-eye" id="toggle-google-eye">👁️</span>
+    </div>
+    <a class="get-key-link" href="https://aistudio.google.com/app/apikey" target="_blank">
+      🔗 Get Free Google AI Studio API Key →
+    </a>
+    <div class="steps">
+      <strong>📋 How to get free Google AI Studio API key:</strong>
+      1. Go to aistudio.google.com → Sign in with Google<br>
+      2. Click "Get API Key" → Create API Key<br>
+      3. Copy key (starts with AIzaSy) → Paste above
+    </div>
+  </div>
+
+  <!-- ── COMMON SETTINGS ───────────────────────────────────────────────── -->
+  <label>Tone</label>
+  <select id="tone">
+    <option value="formal">Formal (Client Communication)</option>
+    <option value="friendly">Friendly (Internal Team)</option>
+    <option value="neutral">Neutral</option>
+  </select>
+
+  <button class="save-btn" id="save-btn">💾 Save Settings</button>
+  <p id="msg"></p>
+
+  <hr class="divider">
+
+  <!-- STATUS BOX -->
+  <div class="status-box">
+    <div class="status-row">
+      <span class="dot" id="status-dot"></span>
+      <span id="api-status">Checking API key...</span>
+    </div>
+    <div id="api-model-status"></div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
